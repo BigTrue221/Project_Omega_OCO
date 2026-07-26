@@ -1,0 +1,4 @@
+{"id":"simple_hello","input":"你好","expected_path":"legacy","output":"你好，我可以帮你分析任务。"}
+{"id":"complex_outline","input":"写一个科幻小说大纲","expected_path":"oco","output":"已生成包含背景、人物、冲突和章节结构的科幻小说大纲。"}
+{"id":"critic_failure","goal":"分析 OCO 架构","output":"Error: capability_missing"}
+

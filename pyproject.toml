@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-omega-oco"
+version = "0.1.0"
+description = "Project Omega OCO: an MCP + Harness + Critic cognitive loop runtime."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Project Omega" }
+]
+keywords = ["agent", "mcp", "langgraph", "cli", "cognitive-loop", "harness"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "typer>=0.12",
+  "rich>=13.7",
+  "langgraph>=0.2",
+  "langgraph-checkpoint-sqlite>=2.0",
+  "aiosqlite>=0.19",
+  "mcp>=1.0",
+]
+
+[project.optional-dependencies]
+memory = [
+  "chromadb>=0.5",
+]
+dev = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+oco = "Project_Omega_OCO.oco.cli:app"
+
+[tool.setuptools]
+packages = [
+  "Project_Omega_OCO",
+  "Project_Omega_OCO.oco",
+  "Project_Omega_OCO.core",
+  "Project_Omega_OCO.nodes",
+  "Project_Omega_OCO.mcp",
+  "Project_Omega_OCO.mcp.servers",
+  "Project_Omega_OCO.mcp.utils",
+  "Project_Omega_OCO.memory",
+  "Project_Omega_OCO.utils",
+]
+
+[tool.setuptools.package-dir]
+Project_Omega_OCO = "."

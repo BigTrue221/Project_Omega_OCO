@@ -1,0 +1,6 @@
+{"stage":"router","goal":"写一个科幻小说大纲","path":"oco"}
+{"stage":"planner","plan_version":1,"event":"generated plan"}
+{"stage":"executor","task_id":"execute_subtasks","event":"completed"}
+{"stage":"critic","score":0.82,"event":"passed"}
+{"stage":"aggregator","final_response":"已完成大纲生成。"}
+

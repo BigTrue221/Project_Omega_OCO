@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Runtime state
+*.log
+*.pid
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+chroma_db/
+test_chroma_db/
+checkpoints/
+logs/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
