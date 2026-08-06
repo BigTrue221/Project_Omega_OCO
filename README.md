@@ -179,7 +179,8 @@ Minimum:
 Optional:
 
 - ChromaDB for L3 vector memory.
-- Local OpenAI-compatible `llama.cpp` server at `http://127.0.0.1:8081/v1/chat/completions`.
+- Local OpenAI-compatible `llama.cpp` server at `http://127.0.0.1:8081/v1/chat/completions` (default).
+- Optional Ollama native chat API at `http://127.0.0.1:11434/api/chat`.
 - OpenRouter-compatible cloud model if `USE_CLOUD_LLM=true`.
 
 Copy `.env.example` if you need local configuration:
@@ -187,6 +188,20 @@ Copy `.env.example` if you need local configuration:
 ```bash
 cp .env.example .env
 ```
+
+The default local backend is llama.cpp. To opt into Ollama, set:
+
+```bash
+OCO_LOCAL_LLM_PROVIDER=ollama
+OCO_LOCAL_LLM_URL=http://127.0.0.1:11434/api/chat
+OCO_LOCAL_LLM_MODEL=ollama/dolphin3-mistral-32k:latest
+OCO_OLLAMA_NUM_CTX=2048
+OCO_OLLAMA_TIMEOUT=300
+```
+
+Ollama uses its native response format and strips the optional `ollama/` model
+prefix before sending the request. Existing llama.cpp settings remain the
+baseline when `OCO_LOCAL_LLM_PROVIDER` is not `ollama`.
 
 ## CLI Contract
 
