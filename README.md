@@ -99,6 +99,20 @@ Run the full cognitive loop:
 oco run "分析这个任务并给出执行方案" --timeout 600
 ```
 
+Open the resident terminal workbench (input remains available while a task runs):
+
+```bash
+oco tui
+# or open it with a first task
+oco tui "写一个科幻小说大纲"
+```
+
+Inside the TUI, `Enter` submits or queues a turn, `/new` starts a new
+checkpoint thread, `/detail` toggles execution details, and `/quit` exits.
+The dashboard exposes Router → Planner → Executor → Critic → Aggregator,
+progress callbacks, plan preview, queued turns, checkpoint thread ID, and the
+final Markdown result.
+
 ## Feishu Through botmux
 
 OCO does not own Feishu credentials, webhooks, tunnels, cards, or topic

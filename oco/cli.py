@@ -14,6 +14,7 @@ from rich.table import Table
 
 from .botmux import OCOBotmuxRunner
 from .capability import OCOCapability
+from .tui import run_tui
 
 
 app = typer.Typer(
@@ -132,6 +133,19 @@ def run(
         return
 
     console.print(result.get("response", result))
+
+
+@app.command()
+def tui(
+    goal: Optional[str] = typer.Argument(None, help="Optional first task to run after the UI opens."),
+    timeout: int = typer.Option(600, "--timeout", help="Execution timeout per task in seconds."),
+    vector_store: bool = typer.Option(False, "--vector-store", help="Enable vector store during execution."),
+) -> None:
+    """Open the resident OCO workbench with a persistent input bar."""
+    try:
+        run_tui(goal, timeout=timeout, enable_vector_store=vector_store)
+    except RuntimeError as exc:
+        raise typer.BadParameter(str(exc)) from exc
 
 
 @app.command()

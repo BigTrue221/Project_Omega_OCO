@@ -106,6 +106,22 @@ class OCORouter:
         
         complexity = self.assess_complexity(message)
         
+        # Continuation acknowledgements are short, but must not fall out of
+        # the OCO thread merely because they do not contain a complex-task
+        # keyword.  This is what makes "继续"/"好的" useful after a long task.
+        if (
+            complexity == TaskComplexity.SIMPLE
+            and context.get("thread_id")
+            and self._is_continuation_message(message)
+        ):
+            return RouteDecision(
+                path=RoutePath.OCO,
+                thread_id=context["thread_id"],
+                complexity=complexity,
+                reasoning="续传确认消息，恢复当前 OCO thread",
+                metadata={"is_new_task": False},
+            )
+
         # 简单任务：使用传统路径（快速响应）
         if complexity == TaskComplexity.SIMPLE:
             return RouteDecision(
@@ -134,6 +150,14 @@ class OCORouter:
             metadata={"is_new_task": is_new_task}
         )
     
+    def _is_continuation_message(self, message: str) -> bool:
+        """Return whether a short message explicitly continues a task."""
+        continuation_keywords = {
+            "好的", "好", "行", "可以", "继续", "接着", "然后",
+            "y", "yes", "yeah", "ok", "okay", "嗯", "对", "是的",
+        }
+        return message.lower().strip() in continuation_keywords
+
     def detect_new_task(self, message: str, context: Dict[str, Any]) -> bool:
         """
         检测是否为新任务

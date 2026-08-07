@@ -140,7 +140,34 @@ class OmegaCognitiveGraph:
             from .context import progress_callback_var
             token = progress_callback_var.set(progress_callback)
             try:
-                final_state = await self.app.ainvoke(None, config=config)
+                # A checkpoint is a durable conversation/workspace, not a
+                # substitute for the next user turn.  For an explicit
+                # continuation ("继续", "好的"), inject the new goal and
+                # restart the graph from Planner.  The old result set remains
+                # available to Planner through the checkpoint reducer.
+                route_metadata = ((context or {}).get("route") or {}).get("metadata") or {}
+                is_continuation_turn = route_metadata.get("is_new_task") is False
+                if is_continuation_turn:
+                    previous_context = state_snapshot.values.get("context") or {}
+                    continuation_input = {
+                        "goal": goal,
+                        "context": {
+                            **previous_context,
+                            **(context or {}),
+                            "previous_goal": state_snapshot.values.get("goal", ""),
+                            "continuation": True,
+                        },
+                        "current_plan": [],
+                        "plan_version": 0,
+                        "error_count": 0,
+                        "is_final": False,
+                    }
+                    final_state = await self.app.ainvoke(continuation_input, config=config)
+                else:
+                    # Preserve historical replay semantics for callers that
+                    # intentionally invoke a completed thread without route
+                    # metadata (for example persistence/replay tooling).
+                    final_state = await self.app.ainvoke(None, config=config)
             finally:
                 progress_callback_var.reset(token)
             print(f"[Graph][TIMING] 恢复状态执行完成，耗时：{time.time() - invoke_start:.2f}秒")
