@@ -77,6 +77,11 @@ class OCOCapability:
 
     def __init__(self, project_root: Optional[Path] = None):
         self.project_root = Path(project_root or PROJECT_ROOT)
+        # Keep one adapter per capability lifetime.  This matters for resident
+        # surfaces (TUI/botmux): the graph/checkpoint connection and MCP
+        # sessions should not be rebuilt for every turn.
+        self._adapter = None
+        self._adapter_vector_store: Optional[bool] = None
 
     def health(self) -> OCOHealth:
         mcp_package = importlib.util.find_spec("mcp") is not None
@@ -133,7 +138,20 @@ class OCOCapability:
         self._ensure_project_on_path()
         OCOCognitiveLoopAdapter = self._import_symbol("adapter", "OCOCognitiveLoopAdapter")
 
-        adapter = OCOCognitiveLoopAdapter(enable_vector_store=enable_vector_store)
+        if (
+            self._adapter is None
+            or not getattr(self._adapter, "initialized", False)
+            or self._adapter_vector_store != enable_vector_store
+        ):
+            if self._adapter is not None:
+                try:
+                    self._adapter.close()
+                except Exception:
+                    pass
+            self._adapter = OCOCognitiveLoopAdapter(enable_vector_store=enable_vector_store)
+            self._adapter_vector_store = enable_vector_store
+
+        adapter = self._adapter
         if not adapter.initialized:
             return {
                 "success": False,
@@ -147,6 +165,15 @@ class OCOCapability:
             timeout=timeout,
             progress_callback=progress_callback,
         )
+
+    def close(self) -> None:
+        """Release a resident adapter and its MCP/checkpoint resources."""
+        if self._adapter is not None:
+            try:
+                self._adapter.close()
+            finally:
+                self._adapter = None
+                self._adapter_vector_store = None
 
     def plan(
         self,
